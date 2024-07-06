@@ -17,10 +17,7 @@ const landOnLeft = true;
 const small = 1;
 const medium = 2;
 const large = 3;
-const treeSize = small; 
-
-// store final lines here
-const printLines = [];
+const treeSize = large; 
 
 let line = [];
 
@@ -117,19 +114,88 @@ if (landOnLeft) {
   let rand = ~~(bt.rand() * 17) - 8; // between -8 and 8
   treeCenter = 12 * (divider - 1) + rand;
 
-  tree.push([treeCenter, line[Math.round(treeCenter / 16)]]);
+  tree.push([treeCenter, line[Math.round(treeCenter / 16)] - 16]);
   tree.push([treeCenter + treeHeight / 16, treeHeight]);
+
+  tree.push([-16 + treeCenter + treeHeight / 16, treeHeight]);
+  tree.push([-16 + treeCenter, line[Math.round(treeCenter / 16)] - 16]);
 } else {
   let rand = ~~(bt.rand() * 17) - 8; // between -8 and 8
   treeCenter = 16 * (divider - 1) + (512 - 16 * (divider - 1)) / (4 / 3) + rand;
 
-  tree.push([treeCenter, line[Math.round(treeCenter / 16)]]);
+  tree.push([treeCenter, line[Math.round(treeCenter / 16)] - 16]);
   tree.push([treeCenter - treeHeight / 16, treeHeight]);
+
+  tree.push([16 + treeCenter - treeHeight / 16, treeHeight]);
+  tree.push([16 + treeCenter, line[Math.round(treeCenter / 16)] - 16]);
 }
 
 tree = bt.catmullRom(tree, 5);
 
 // draw 
+drawLines([tree], {fill: "brown", stroke: "brown", width: 2});
 drawLines([land], {fill: "yellow", stroke: "yellow", width: 2});
 drawLines([wave], {fill: "blue", stroke: "blue", width: 2});
-drawLines([tree], {fill: "brown", stroke: "brown", width: 2});
+
+const num_leaves = 10
+
+for (let i = 0; i < num_leaves; i++) {
+  let leafX = 100;
+  let leafY = 40;
+
+  if (treeSize == small) {
+    leafX *= 256/320;
+    leafY *= 256/320
+  } else if (treeSize == large) {
+    leafX *= 384/320;
+    leafY *= 384/320
+  }
+  
+  const finalLines = [];
+  
+  let topEdge = [
+    bt.nurbs([
+      [0, 0],
+      [leafX*0.05, leafY*0.5],
+      [leafX*0.25, leafY*.8],
+      [leafX*0.5, leafY*.95],
+      [leafX, leafY]
+    ])
+  ]
+
+  let curr_point = [leafX, leafY];
+  
+  for (let i = 0; i < 4; i++) {
+    let slope = curr_point[1] / curr_point[0];
+  
+    curr_point = [curr_point[0] - leafX / 4, curr_point[1] - slope * leafX / 4];
+    
+    topEdge[0].push(curr_point);
+  
+    if (i !== 3) {
+      curr_point = [curr_point[0], curr_point[1] - leafY / 10];
+      topEdge[0].push(curr_point);
+    }
+  }
+
+  bt.rotate(topEdge, 20 * ((num_leaves / 4) - (i % (num_leaves / 2))), [0, 0]);
+
+  let origin = [0, 0];
+  
+  if (landOnLeft) {
+    origin = [-8 + treeCenter + treeHeight / 16, treeHeight];
+  } else {
+    origin = [8 + treeCenter - treeHeight / 16, treeHeight];
+  }
+
+  bt.translate(topEdge, origin);
+
+  if (i >= num_leaves / 2) {
+    // reflect
+    for (let j = 0; j < topEdge[0].length; j++) {
+      topEdge[0][j][0] = 2 * origin[0] - topEdge[0][j][0];
+    }
+  }
+  
+  drawLines(topEdge, {fill: "green", stroke: "black", width: 2});
+}
