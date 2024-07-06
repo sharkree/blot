@@ -4,7 +4,7 @@
 // check out this guide to learn how to program in blot
 // https://blot.hackclub.com/editor?guide=start
 
-const seed = 65336;
+const seed = 923875;
 bt.setRandSeed(seed);
 
 const width = 512;
@@ -17,7 +17,7 @@ const landOnLeft = true;
 const small = 1;
 const medium = 2;
 const large = 3;
-const treeSize = large; 
+const treeSize = medium; 
 
 let line = [];
 
