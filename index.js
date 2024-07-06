@@ -4,14 +4,6 @@
 // check out this guide to learn how to program in blot
 // https://blot.hackclub.com/editor?guide=start
 
-const width = 125;
-const height = 125;
-// check out the workshop tab to get started
-// welcome to blot!
-
-// check out this guide to learn how to program in blot
-// https://blot.hackclub.com/editor?guide=start
-
 const seed = 65336;
 bt.setRandSeed(seed);
 
@@ -21,6 +13,11 @@ const height = 512;
 setDocDimensions(width, height);
 
 const landOnLeft = true;
+
+const small = 1;
+const medium = 2;
+const large = 3;
+const treeSize = small; 
 
 // store final lines here
 const printLines = [];
@@ -76,9 +73,7 @@ for (let i = 0; i <= 32; i++) {
   }
 }
 
-console.log(land);
 land = bt.catmullRom(land, 5);
-console.log(land);
 wave = bt.catmullRom(wave, 5);
 
 if (landOnLeft) {
@@ -101,28 +96,40 @@ if (landOnLeft) {
   land.push([16 * (divider - 1), 0]);
 }
 
+let treeCenter = 0;
+let treeWidth = 0;
+let treeHeight = 0;
+
+if (treeSize == small) {
+  treeWidth = 8;
+  treeHeight = 256;
+} else if (treeSize == medium) {
+  treeWidth = 16;
+  treeHeight = 320;
+} else {
+  treeWidth = 32;
+  treeHeight = 384;
+}
+
+let tree = [];
+
+if (landOnLeft) {
+  let rand = ~~(bt.rand() * 17) - 8; // between -8 and 8
+  treeCenter = 12 * (divider - 1) + rand;
+
+  tree.push([treeCenter, line[Math.round(treeCenter / 16)]]);
+  tree.push([treeCenter + treeHeight / 16, treeHeight]);
+} else {
+  let rand = ~~(bt.rand() * 17) - 8; // between -8 and 8
+  treeCenter = 16 * (divider - 1) + (512 - 16 * (divider - 1)) / (4 / 3) + rand;
+
+  tree.push([treeCenter, line[Math.round(treeCenter / 16)]]);
+  tree.push([treeCenter - treeHeight / 16, treeHeight]);
+}
+
+tree = bt.catmullRom(tree, 5);
+
 // draw 
 drawLines([land], {fill: "yellow", stroke: "yellow", width: 2});
 drawLines([wave], {fill: "blue", stroke: "blue", width: 2});
-setDocDimensions(width, height);
-
-// store final lines here
-const finalLines = [];
-
-// create a polyline
-const polyline = [
-  [30, 90],
-  [100, 90],
-  [100, 30],
-  [30, 30],
-  [30, 90]
-];
-
-// add the polyline to the final lines
-finalLines.push(polyline);
-
-// transform lines using the toolkit
-bt.rotate(finalLines, 45);
-
-// draw it
-drawLines(finalLines);
+drawLines([tree], {fill: "brown", stroke: "brown", width: 2});
