@@ -133,11 +133,19 @@ if (landOnLeft) {
 tree = bt.catmullRom(tree, 5);
 
 // draw 
-drawLines([tree], {fill: "brown", stroke: "brown", width: 2});
+drawLines([tree], {fill: "gray", stroke: "brown", width: 2});
 drawLines([land], {fill: "yellow", stroke: "yellow", width: 2});
 drawLines([wave], {fill: "blue", stroke: "blue", width: 2});
 
 const num_leaves = 10
+
+let origin = [0, 0];
+  
+if (landOnLeft) {
+  origin = [-8 + treeCenter + treeHeight / 16, treeHeight];
+} else {
+  origin = [8 + treeCenter - treeHeight / 16, treeHeight];
+}
 
 for (let i = 0; i < num_leaves; i++) {
   let leafX = 100;
@@ -180,14 +188,6 @@ for (let i = 0; i < num_leaves; i++) {
 
   bt.rotate(topEdge, 20 * ((num_leaves / 4) - (i % (num_leaves / 2))), [0, 0]);
 
-  let origin = [0, 0];
-  
-  if (landOnLeft) {
-    origin = [-8 + treeCenter + treeHeight / 16, treeHeight];
-  } else {
-    origin = [8 + treeCenter - treeHeight / 16, treeHeight];
-  }
-
   bt.translate(topEdge, origin);
 
   if (i >= num_leaves / 2) {
@@ -198,4 +198,47 @@ for (let i = 0; i < num_leaves; i++) {
   }
   
   drawLines(topEdge, {fill: "green", stroke: "black", width: 2});
+}
+
+let coconut = [[]];
+
+let radius = 12;
+
+if (treeSize == small) {
+  radius *= 256/320;
+} else if (treeSize == large) {
+  radius *= 384/320;
+}
+
+const lines = 32;
+
+for (let j = 0; j < lines + 1; j++) {
+  coconut[0].push([radius * Math.cos(2 * Math.PI * j / lines), radius * Math.sin(2 * Math.PI * j / lines)]);
+}
+
+bt.translate(coconut, origin);
+
+drawLines(coconut, {fill: "brown", stroke: "black", width: 2});
+
+for (let i = 0; i < 5; i++) {
+  let coconut = [[]];
+
+  let radius = 12;
+
+  if (treeSize == small) {
+    radius *= 256/320;
+  } else if (treeSize == large) {
+    radius *= 384/320;
+  }
+
+  const lines = 32;
+
+  for (let j = 0; j < lines + 1; j++) {
+    coconut[0].push([radius * Math.cos(2 * Math.PI * j / lines), radius * Math.sin(2 * Math.PI * j / lines)]);
+  }
+
+  bt.rotate(coconut, 45 * (i - 1), [radius * 0.8, radius * 0.8]);
+  bt.translate(coconut, [origin[0] - radius, origin[1] - radius]);
+  
+  drawLines(coconut, {fill: "brown", stroke: "black", width: 2});
 }
